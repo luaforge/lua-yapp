@@ -1,0 +1,93 @@
+
+Yet Another PalmOS Port of Lua
+==============================
+
+This is a port of the Lua language (http://www.lua.org/) to the PalmOS
+operating system.  This project is MIT licensed (as is the Lua
+software).  The original work on the port was done by Gerhard Sittig.
+The project is hosted at http://luaforge.net/projects/lua-yapp/.
+
+
+What's specific to this port
+----------------------------
+
+Since PalmOS is "freestanding" in terms of ANSI C, just rebuilding the
+Lua sources did not suffice.  Although an ANSI C compliant compiler was
+available, the ANSI C runtime was not.  Parts of the runtime could be
+mapped to PalmOS API calls, other parts needed to be wrapped around the
+PalmOS API or get written anew.  Where the DIY runtime lacks features or
+does not comply with the spec, it's a bug in this project and not Lua's
+fault.
+
+Other differences result from limitations of the PalmOS environment.
+Certain features like environment variables, remote processes and
+communicating to them, loading external modules, localization and
+internationalization, etc may be completely missing or may be supported
+only partially.  Some of these limitations could be "solved" by
+requiring certain OS versions, but that would have locked out too many
+users to gain too little benefit.
+
+
+What's working
+--------------
+
+- the Lua 5.1 core: VM, parser (but see "Bugs" below)
+- standard Lua libraries: base, string, math, table, debug (io, os
+  partially)
+- both "long" and "double" internal number formats
+- stdin/stdout/stderr I/O, getting input from the user by means of an UI
+  dialog and printing output into a scrollable UI gadget with optional
+  markup
+- module and library support, either by statically linking or given that
+  the SysLib's API is known at compile time
+
+
+What will be working RSN(TM)
+----------------------------
+
+- the complete Lua instruction set, once it's determined why internal
+  state gets damaged
+- file I/O, based on the FileManager API and Memopad documents
+- simple PLua inspired PalmOS binding with DB access, turtle graphics,
+  maybe communication, unlikely dynamic UI
+- module and library support by SysLibs, given that the SysLib's API is
+  known at compile time
+
+
+What's planned for later
+------------------------
+
+- more optional file storage alternatives: par(1) type databases, memory
+  card VFS stuff, an "LPFS" database? (what's the "doc" format's
+  layout?)
+- a PLua compatible PalmOS binding?  with modules and hierarchical
+  names, with an optional install() method to populate the global name
+  space?  requires solving of the "event()" support problem
+- can we generate SYS_TRAP() calls for a given routine index at runtime?
+  that would allow for completely dynamic package.loadlib() support;
+  otherwise we would need a __call() metamethod which intercepts the
+  actual call to a routine of the lib from the app and tunnels it
+  through a dispatcher in the lib which is on a known index and calls
+  the actually wanted routine (specified either by name or index)
+- do we need to tell "interactive" from "scripted" modes as PLua does?
+  is "fullscreen" that important?
+
+
+Known bugs
+----------
+
+- not all Lua instructions are completely operational yet, some cause
+  the application to crash, especially loop and subroutine ops (is this
+  a problem with 32bit "Intruction" and 16bit "int" types?)
+- the output gadget does not yet release stored output beyond the
+  configured limit, a manual "erase" is needed
+
+
+Known limitations
+-----------------
+
+- 64KB limit for malloc() and database records (could be removed if
+  necessary by switching to FeatureMemory or DIY malloc())
+- floating point operations require MathLib, but the app ships with a
+  copy and optionally can install it
+
