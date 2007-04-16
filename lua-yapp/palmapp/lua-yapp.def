@@ -1,0 +1,56 @@
+/* ----- lua-yapp.def ---------------------------------------- */
+
+application {
+	"Lua-YAPP"
+	LUAP
+}
+
+multiple code {
+	/* the "catch all" Lua segment */
+	"cs_lua"
+
+	/* the specific Lua segments */
+	"cs_lapi"
+	"cs_lauxl"
+	"cs_lcode"
+	"cs_ldbg"
+	"cs_ldo"
+	"cs_ldump"
+	"cs_lfunc"
+	"cs_lgc"
+	"cs_llex"
+	"cs_lmem"
+	"cs_lobj"
+	"cs_linit"
+	"cs_lprsr"
+	"cs_lstat"
+	"cs_lstr"
+	"cs_ltbl"
+	"cs_ltm"
+	"cs_lvm"
+	"cs_lzio"
+
+	/* the "openlibs()" Lua segments */
+	"cs_lbasl"
+	"cs_ldblb"
+	"cs_liolb"
+	"cs_ldlib"
+	"cs_loslb"
+	"cs_lstrl"
+	"cs_ltblb"
+	"cs_lmath"
+
+	/* the runtime lib (OS wrapper) segment */
+	"cs_rtl"
+	"cs_martl"
+
+	/* the application and "palmos" module segments */
+	"cs_app"
+	"cs_plib"
+
+	/* the "luac(1) segments" */
+	"cs_luac"
+	"cs_lprnt"
+}
+
+/* ----- E O F ----------------------------------------------- */

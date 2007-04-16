@@ -1,0 +1,454 @@
+/* ----- palmapp.rcp ----------------------------------------- */
+/*
+ * resource file for the Yet Another PalmOS Port of Lua application
+ */
+
+#include "palmapp.h"
+
+/*
+ * pref chunk, layout SysAppPrefsType, sets up
+ * prio (unused), stack size (32KB), minumum heap (unused)
+ */
+/*
+ * build-prc says "warning: resource 'pref' #0 already obtained from 'lua-yapp'"?
+SYSAPPLICATIONPREFERENCES
+HEX "pref" ID 0
+	0x00 0x1E
+	0x00 0x00 0x80 0x00
+	0x00 0x00 0x10 0x00
+ */
+
+/* version record, needs to be ID 1 or ID 1000 */
+VERSION ID 1 PROGRAM_VERSION
+
+/* application icons, "large" is 22x22, "small" is 15x9 */
+ICONFAMILY
+	"logo-01-large.bmp"
+	"logo-02-large.bmp"
+	"logo-04-large.bmp"
+	"logo-08-large.bmp"
+	"logo-16-large.bmp"
+SMALLICONFAMILY
+	"logo-01-small.bmp"
+	""
+	""
+	"logo-08-small.bmp"
+	""
+
+/* bitmap data for the about box */
+BITMAPFAMILY ID ID_BMP_ABOUT_LOGO
+	"logo-01-about.bmp"
+	""
+	"logo-04-about.bmp"
+	"logo-08-about.bmp"
+	""
+
+/* feature declaration for the application */
+/* XXX CREATOR needed? get creator from .h */
+/* error: Unknown token : 'FEATURE' ...
+FEATURE ID 1000
+	BEGIN
+		// CREATOR 'LUAP'
+		BEGIN
+			ENTRY NUMBER 1 VALUE 0x05010100
+		END
+	END
+ */
+
+/* main form help, main form menu, main form */
+STRING ID ID_LBL_MAIN_HELP 
+	"Enter any Lua script code (or bytecode chunk :) " \
+	"into the bottom text field and have it \"executed\", " \
+	"or open the \"source editor\" with a bigger text field " \
+	"and the capability to load from or save to the memo pad " \
+	"for a more flexible way to input Lua source code." \
+	"\n\n" \
+	"This main form input field does support the notion " \
+	"of prefixing your command with the '=' sign to have " \
+	"the results printed out.  Although it does not mimic " \
+	"the behaviour of the interactive lua interpreter to " \
+	"collect input until it can be compiled successfully." \
+	"\n\n" \
+	"The \"byte code\" button is a development aid only. " \
+	"As are the fake \"File\" menu items. " \
+	""
+
+MENU ID ID_MENU_MAIN
+	BEGIN
+
+		PULLDOWN "File"
+		BEGIN   
+			MENUITEM "New (stdout)"          ID_MITEM_MAIN_FILE_NEW         "N"
+			MENUITEM "Open (stdin)"          ID_MITEM_MAIN_FILE_OPEN        "O"
+			MENUITEM "Close (rfsh)"          ID_MITEM_MAIN_FILE_CLOSE       "L"
+			MENUITEM "Run (runtime)"         ID_MITEM_MAIN_FILE_RUN         "R"
+			MENUITEM "Quit (erase)"          ID_MITEM_MAIN_FILE_QUIT        "Q"
+		END
+
+		PULLDOWN "Edit"
+		BEGIN
+			MENUITEM "Undo"			ID 10000 "U"
+			MENUITEM "Cut"			ID 10001 "X"
+			MENUITEM "Copy"			ID 10002 "C"
+			MENUITEM "Paste"		ID 10003 "P"
+			MENUITEM "Select All"		ID 10004 "S"
+			MENUITEM SEPARATOR		AUTOID
+			MENUITEM "Keyboard"		ID 10006 "K"
+			MENUITEM "Graffiti Help"	ID 10007 "G"
+		END
+
+		PULLDOWN "Setup"
+		BEGIN   
+			MENUITEM "Configuration"         ID_MITEM_MAIN_SETUP_CONFIG
+		END
+
+		PULLDOWN "Help"
+		BEGIN   
+			MENUITEM "Help"         ID_MITEM_MAIN_HELP_HELP       "H"
+			MENUITEM "About"        ID_MITEM_MAIN_HELP_ABOUT      "A"
+		END
+
+	END
+
+FORM ID ID_FORM_MAIN AT ( 0 0 160 160 )
+	NOFRAME
+	HELPID ID_LBL_MAIN_HELP
+	MENUID ID_MENU_MAIN
+	BEGIN
+		TITLE   "Lua-YAPP (WIP)"
+
+		GADGET ID ID_FLD_MAIN_OUTPUT AT (1 17 152 112)
+		SCROLLBAR ID ID_SCR_MAIN_OUTPUT AT (153 PREVTOP 7 PREVHEIGHT)
+			USABLE VALUE 0 MIN 0 MAX 100 PAGESIZE 100
+
+		FIELD ID ID_FLD_MAIN_SCRIPT AT (1 132 158 AUTO)
+			MAXCHARS 200 EDITABLE UNDERLINED
+
+		BUTTON	"Execute" ID ID_BTN_MAIN_EXEC AT (1 147 AUTO AUTO)
+		BUTTON	"Src Editor" ID ID_BTN_MAIN_SOURCE AT (PREVRIGHT + 3 PREVTOP AUTO AUTO)
+		BUTTON	"Bytes" ID ID_BTN_MAIN_BYTE AT (PREVRIGHT + 3 PREVTOP AUTO AUTO)
+		GRAFFITISTATEINDICATOR AT (150 150)
+	END
+
+/* source form help, source form menu, source form */
+STRING ID ID_LBL_SOURCE_HELP
+	"Enter any Lua source code or edit it the way " \
+	"you like, optionally making use of the load from " \
+	"or save to memo pad feature or the builtin example " \
+	"templates (please note that when saving the editor " \
+	"content to a new memo pad item then the first line " \
+	"will be taken as the subject)." \
+	"\n\n" \
+	"Have the source code \"executed\" " \
+	"in the main form (this editor form will then close " \
+	"automatically). " \
+	"Or just \"close\" this editor form to return to " \
+	"the main form, without losing your source code " \
+	"(you may return here anytime and continue editing)." \
+	"\n\n" \
+	"Hint: the main form's command input field is a " \
+	"nice way of trying one-liners which could be considered " \
+	"'insertions' into your Lua sessions or can be used to " \
+	"interactively lookup variables or try some approach to " \
+	"find the form of source you then want to put into the " \
+	"actual script by means of the clipboard.  Both text areas " \
+	"are independent of each other but share the same Lua VM." \
+	""
+
+MENU ID ID_MENU_SOURCE
+	BEGIN
+
+		PULLDOWN "File"
+		BEGIN
+			MENUITEM "Turtle sample"	ID ID_MITEM_SOURCE_FILE_STURTLE
+			MENUITEM "Bitmap sample"	ID ID_MITEM_SOURCE_FILE_SBITMAP
+			MENUITEM "House sample"		ID ID_MITEM_SOURCE_FILE_SHOUSE
+			MENUITEM SEPARATOR		AUTOID
+			MENUITEM "Load memo"		ID ID_MITEM_SOURCE_FILE_LMEMO
+			MENUITEM "Save memo"		ID ID_MITEM_SOURCE_FILE_SMEMO
+		END
+
+		PULLDOWN "Edit"
+		BEGIN
+			MENUITEM "Undo"			ID 10000 "U"
+			MENUITEM "Cut"			ID 10001 "X"
+			MENUITEM "Copy"			ID 10002 "C"
+			MENUITEM "Paste"		ID 10003 "P"
+			MENUITEM "Select All"		ID 10004 "S"
+			MENUITEM SEPARATOR		AUTOID
+			MENUITEM "Keyboard"		ID 10006 "K"
+			MENUITEM "Graffiti Help"	ID 10007 "G"
+		END
+
+		PULLDOWN "Help"
+		BEGIN   
+			MENUITEM "Help"         ID_MITEM_SOURCE_HELP_HELP       "H"
+		END
+
+	END
+
+FORM ID ID_FORM_SOURCE AT ( 0 0 160 160 )
+	HELPID ID_LBL_SOURCE_HELP
+	MENUID ID_MENU_SOURCE
+	BEGIN
+		TITLE   "Source Editor"
+
+		FIELD ID ID_FLD_SOURCE_INPUT AT (1 17 152 126)
+			MAXCHARS 64000 EDITABLE DYNAMICSIZE
+			UNDERLINED MULTIPLELINES HASSCROLLBAR
+		SCROLLBAR ID ID_SCR_SOURCE_INPUT
+			AT (PREVRIGHT + 1 PREVTOP 7 PREVHEIGHT)
+			USABLE VALUE 0 MIN 0 MAX 100 PAGESIZE 100
+
+		BUTTON	"Execute" ID ID_BTN_SOURCE_EXEC AT (1 146 AUTO AUTO)
+		BUTTON	"Close" ID ID_BTN_SOURCE_CLOSE AT (PREVRIGHT + 3 PREVTOP AUTO AUTO)
+		BUTTON	"Bytecode" ID ID_BTN_SOURCE_BYTE AT (PREVRIGHT + 3 PREVTOP AUTO AUTO)
+		GRAFFITISTATEINDICATOR AT (150 150)
+	END
+
+/* setup form help, setup form */
+STRING ID ID_LBL_SETUP_HELP
+	"The \"output markup\" setting determines how the " \
+	"different chunks of output from stdin, stdout and stderr " \
+	"are represented in the main form." \
+	"\n\n" \
+	"You can limit the in memory buffer for the output " \
+	"to not exceed a total size, or a maximum number of lines." \
+	"\n\n" \
+	"The other settings are development aids only or incomplete."
+
+FORM ID ID_FORM_SETUP AT ( 0 0 160 160 )
+	HELPID ID_LBL_SETUP_HELP
+	BEGIN
+		TITLE   "Configuration"
+
+		LABEL	"output markup" AUTOID AT (5 20) USABLE FONT 0
+		PUSHBUTTON	"none" ID ID_BTN_SETUP_OUTPUT_MARKUP_NONE AT (PREVRIGHT + 5 PREVTOP AUTO AUTO) GROUP 1
+		PUSHBUTTON	"mono" ID ID_BTN_SETUP_OUTPUT_MARKUP_MONO AT (PREVRIGHT + 0 PREVTOP AUTO AUTO) GROUP 1
+		PUSHBUTTON	"color" ID ID_BTN_SETUP_OUTPUT_MARKUP_COLOR AT (PREVRIGHT + 0 PREVTOP AUTO AUTO) GROUP 1
+
+		LABEL "history max" AUTOID AT (5 PREVBOTTOM + 5)
+		FIELD ID ID_FLD_SETUP_MAXLINES AT (PREVRIGHT + 5 PREVTOP 18 PREVHEIGHT)
+			MAXCHARS 3 EDITABLE UNDERLINED SINGLELINE
+			RIGHTALIGN AUTOSHIFT NUMERIC
+		LABEL "lines" AUTOID AT (PREVRIGHT + 1 PREVTOP)
+
+		FIELD ID ID_FLD_SETUP_MAXBYTES AT (PREVRIGHT + 5 PREVTOP 24 PREVHEIGHT)
+			MAXCHARS 4 EDITABLE UNDERLINED SINGLELINE
+			RIGHTALIGN AUTOSHIFT NUMERIC
+		LABEL "bytes" AUTOID AT (PREVRIGHT + 1 PREVTOP)
+
+		CHECKBOX	"use highres for output" ID ID_CHK_SETUP_HIRES AT (5 PREVBOTTOM + 5 AUTO AUTO)
+
+		LABEL	"" AUTOID AT (5 PREVBOTTOM + 5)
+
+		CHECKBOX	"diagnostic alerts (devel)" ID ID_CHK_SETUP_DIAG_CAPA AT (5 PREVBOTTOM + 5 AUTO AUTO)
+
+		BUTTON	"Apply" ID ID_BTN_SETUP_APPLY AT (5 PREVBOTTOM + 5 AUTO AUTO)
+		BUTTON	"Cancel" ID ID_BTN_SETUP_CANCEL AT (PREVRIGHT + 10 PREVTOP AUTO AUTO)
+
+		GRAFFITISTATEINDICATOR AT (150 150)
+	END
+
+/* runtime form help, runtime form */
+STRING ID ID_LBL_RUNTIME_HELP
+	"this form is a development aid only and has no user servicable parts inside"
+
+FORM ID ID_FORM_RUNTIME AT ( 0 0 160 160 )
+	HELPID ID_LBL_RUNTIME_HELP
+	BEGIN
+		TITLE   "Runtime Check"
+		LABEL   "test cases here only" AUTOID AT (10 20) USABLE FONT 0
+		LABEL   "... yet to be filled in ..." AUTOID AT (10 80) USABLE FONT 0
+		BUTTON	"Some" ID ID_BTN_RUNTIME_SOME AT (PREVLEFT PREVBOTTOM + 5 AUTO AUTO)
+		BUTTON	"Close" ID ID_BTN_RUNTIME_CLOSE AT (10 145 AUTO AUTO)
+	END
+
+/* file selector form help, file selector form */
+STRING ID ID_LBL_FILESEL_HELP
+	"You can pick a file by selecting its name in the list " \
+	"or - when the appropriate button is enabled - you can " \
+	"choose to create a new one." \
+	"\n\n" \
+	"The \"Cancel\" button aborts the load or save operation."
+
+FORM ID ID_FORM_FILESEL AT ( 0 0 160 160 )
+	HELPID ID_LBL_FILESEL_HELP
+	BEGIN
+		TITLE	"File selector"
+		LABEL	"pick a file" AUTOID AT (5 20) USABLE FONT 0
+		LIST 	"" ID ID_LST_FILESEL_FILES AT (PREVLEFT 32 150 110) USABLE VISIBLEITEMS 10 FONT 0
+		BUTTON	"OK" ID ID_BTN_FILESEL_OK AT (PREVLEFT PREVBOTTOM + 5 AUTO AUTO)
+		BUTTON	"Cancel" ID ID_BTN_FILESEL_CANCEL AT (PREVRIGHT + 5 PREVTOP AUTO AUTO)
+		BUTTON	"New memo" ID ID_BTN_FILESEL_MKNEW AT (PREVRIGHT + 5 PREVTOP AUTO AUTO)
+	END
+
+/* about alert (it's a form for better results) */
+FORM ID ID_FORM_ABOUT AT ( 2 20 156 138 )
+	FRAME
+	MODAL
+	BEGIN
+		TITLE "About Lua-YAPP"
+
+		FORMBITMAP AT (5 13) BITMAP ID_BMP_ABOUT_LOGO USABLE
+
+		LABEL	"lua-yapp 0.1" AUTOID AT (75 PREVTOP + 2) USABLE FONT 0
+		LABEL	"" AUTOID AT (PREVLEFT PREVTOP + 5)
+
+		LABEL	"Lua 5.1.2 from" AUTOID AT (75 PREVTOP + 11) USABLE FONT 0
+		LABEL	"Lua.org PUC-Rio" AUTOID AT (75 PREVTOP + 11)
+		LABEL	"" AUTOID AT (PREVLEFT PREVTOP + 5)
+
+		LABEL	"PalmOS port" AUTOID AT (PREVLEFT PREVTOP + 11)
+		LABEL	"by G.Sittig" AUTOID AT (PREVLEFT PREVTOP + 11)
+		LABEL	"" AUTOID AT (PREVLEFT PREVTOP + 5)
+
+		LABEL	"Lua logo design by A.Nakonechnyj" AUTOID AT (5 PREVTOP + 11)
+		LABEL	"" AUTOID AT (PREVLEFT PREVTOP + 5)
+
+		LABEL	"luaforge.net/projects/lua-yapp/" AUTOID AT (5 PREVTOP + 11)
+		LABEL	"" AUTOID AT (PREVLEFT PREVTOP + 5)
+
+		BUTTON "OK" AUTOID AT (CENTER PREVBOTTOM AUTO AUTO)
+	END
+
+/* "init failed" alert */
+ALERT ID ID_FORM_INIT_FAILED
+	ERROR
+	BEGIN
+		TITLE "Initialization failed"
+		MESSAGE "could not initialize the runtime environment"
+		BUTTONS "OK"
+	END
+
+/* informational notification alert */
+ALERT ID ID_FORM_INFORMATION
+	INFORMATION
+	BEGIN
+		TITLE "Information"
+		MESSAGE "^1\n^2\n^3"
+		BUTTONS "OK"
+	END
+
+/* failure notification alert */
+ALERT ID ID_FORM_FAILURE
+	ERROR
+	BEGIN
+		TITLE "A failure occured"
+		MESSAGE "^1\n^2\n^3"
+		BUTTONS "OK"
+	END
+
+/* "input required" alert */
+ALERT ID ID_FORM_STDIN
+	CONFIRMATION
+	BEGIN
+		TITLE "Input required"
+		MESSAGE "^1"
+		BUTTONS "OK" "Newline" "EOF"
+	END
+
+/* alert about MathLib.prc missing */
+STRING ID ID_LBL_MATH_HELP
+	"MathLib is a free shared library " \
+	"that can be used by any OS 2.0+ Pilot program " \
+	"that needs IEEE 754 double precision math functions.  " \
+	"It's distributed under the terms of the " \
+	"GNU Library General Public License, and is " \
+	"freely available with full source code and " \
+	"documentation at the MathLib Information web page " \
+	"(http://www.radiks.net/~rhuebner/mathlib.html).  " \
+	"The MathLib library is not a part of the " \
+	"Lua-YAPP software, and these two software projects " \
+	"don't share a common license.  The Lua-YAPP software " \
+	"simply includes a copy of the MathLib.prc archive " \
+	"for your convenience."
+
+ALERT ID ID_FORM_MATHLIB_MISSING
+	ERROR
+	HELPID ID_LBL_MATH_HELP
+	BEGIN
+		TITLE "Initialization failed"
+		MESSAGE "It seems that MathLib.prc " \
+			"which is required for this application " \
+			"is not available on this device.\n\n" \
+			"You can choose to have the library " \
+			"installed for you (but may need to " \
+			"restart the application afterwards)."
+		BUTTONS "OK" "Install"
+	END
+
+/* MathLib.prc embedded database */
+DATA "Mprc" ID ID_DAT_MATHLIB_PRC "../contrib/MathLib/MathLib.prc"
+
+/* example code embedded as resources */
+/* could be done by 'FILE "name"' but I might want to modify those */
+
+STRING ID ID_STR_SAMPLE_TURTLE
+	"-- turtle.lua\n" \
+	"-- turtle graphics example\n" \
+	"\n" \
+	"p = require('palmos')\n" \
+	"\n" \
+	"count = 80\n" \
+	"angle = 70\n" \
+	"length = 30\n" \
+	"\n" \
+	"direction = 0\n" \
+	"p.moveto(50, 120)\n" \
+	"for i = 1, count do\n" \
+	"  p.heading(direction)\n" \
+	"  direction = direction + angle\n" \
+	"  p.walk(length)\n" \
+	"end\n" \
+	"-- E O F\n"
+
+STRING ID ID_STR_SAMPLE_BITMAP
+	"-- bitmap.lua\n" \
+	"-- get a bitmap from a database\n" \
+	"\n" \
+	"p = require('palmos')\n" \
+	"\n" \
+	"-- it seems this address does not work on 5.x devices\n" \
+	"taxi = p.openres('Tbmp', 11000)\n" \
+	"if (taxi) then\n" \
+	"  p.moveto(10, 20)\n" \
+	"  p.drawbmp(taxi)\n" \
+	"  p.closeres(taxi)\n" \
+	"end\n" \
+	"\n" \
+	"-- in case the taxi is not found, use our logo\n" \
+	"logo = p.openres('Tbmp', 8021)\n" \
+	"if (logo) then\n" \
+	"  p.moveto(10, 60)\n" \
+	"  p.drawbmp(logo)\n" \
+	"  p.closeres(logo)\n" \
+	"end\n" \
+	"\n" \
+	"-- E O F\n"
+
+STRING ID ID_STR_SAMPLE_HOUSE
+	"-- house.lua\n" \
+	"-- ... das ist das Haus ...\n" \
+	"\n" \
+	"p = require('palmos')\n" \
+	"\n" \
+	"t = {\n" \
+	"  {  45, 100 },\n" \
+	"  { 180,  70 },\n" \
+	"  { 315, 100 },\n" \
+	"  { 180,  70 },\n" \
+	"  {  90,  70 },\n" \
+	"  {  45,  50 },\n" \
+	"  { 315,  50 },\n" \
+	"  { 270,  70 },\n" \
+	"}\n" \
+	"\n" \
+	"p.moveto(10, 130)\n" \
+	"for _, s in ipairs(t) do\n" \
+	"  p.heading(s[1])\n" \
+	"  p.walk(s[2])\n" \
+	"end\n" \
+	"-- E O F\n"
+
+/* ----- E O F ----------------------------------------------- */
