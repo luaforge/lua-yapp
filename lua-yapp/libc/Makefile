@@ -6,7 +6,7 @@
 LIBRARY = libc.a
 
 # where to extract the .o files from
-TEMPLATE = /usr/m68k-palmos/lib/libc.a
+TEMPLATE = $(M68KDIR)/lib/libc.a
 
 # which .o files to use
 OBJECTS = 

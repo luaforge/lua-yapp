@@ -19,7 +19,7 @@ HEX "pref" ID 0
  */
 
 /* version record, needs to be ID 1 or ID 1000 */
-VERSION ID 1 PROGRAM_VERSION
+VERSION ID 1 "0.1"
 
 /* application icons, "large" is 22x22, "small" is 15x9 */
 ICONFAMILY
@@ -92,7 +92,7 @@ MENU ID ID_MENU_MAIN
 			MENUITEM "Copy"			ID 10002 "C"
 			MENUITEM "Paste"		ID 10003 "P"
 			MENUITEM "Select All"		ID 10004 "S"
-			MENUITEM SEPARATOR		AUTOID
+			MENUITEM "-"			AUTOID
 			MENUITEM "Keyboard"		ID 10006 "K"
 			MENUITEM "Graffiti Help"	ID 10007 "G"
 		END
@@ -163,7 +163,7 @@ MENU ID ID_MENU_SOURCE
 			MENUITEM "Turtle sample"	ID ID_MITEM_SOURCE_FILE_STURTLE
 			MENUITEM "Bitmap sample"	ID ID_MITEM_SOURCE_FILE_SBITMAP
 			MENUITEM "House sample"		ID ID_MITEM_SOURCE_FILE_SHOUSE
-			MENUITEM SEPARATOR		AUTOID
+			MENUITEM "-"			AUTOID
 			MENUITEM "Load memo"		ID ID_MITEM_SOURCE_FILE_LMEMO
 			MENUITEM "Save memo"		ID ID_MITEM_SOURCE_FILE_SMEMO
 		END
@@ -175,7 +175,7 @@ MENU ID ID_MENU_SOURCE
 			MENUITEM "Copy"			ID 10002 "C"
 			MENUITEM "Paste"		ID 10003 "P"
 			MENUITEM "Select All"		ID 10004 "S"
-			MENUITEM SEPARATOR		AUTOID
+			MENUITEM "-"			AUTOID
 			MENUITEM "Keyboard"		ID 10006 "K"
 			MENUITEM "Graffiti Help"	ID 10007 "G"
 		END
@@ -369,12 +369,10 @@ ALERT ID ID_FORM_MATHLIB_MISSING
 	HELPID ID_LBL_MATH_HELP
 	BEGIN
 		TITLE "Initialization failed"
-		MESSAGE "It seems that MathLib.prc " \
-			"which is required for this application " \
-			"is not available on this device.\n\n" \
-			"You can choose to have the library " \
-			"installed for you (but may need to " \
-			"restart the application afterwards)."
+		MESSAGE "MathLib.prc is required but was not found." \
+			"\n\n" \
+			"You can have the library installed for you " \
+			"(but may need to restart the application)."
 		BUTTONS "OK" "Install"
 	END
 

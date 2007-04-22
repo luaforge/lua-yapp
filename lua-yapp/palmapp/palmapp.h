@@ -12,8 +12,6 @@
 #ifndef PALMAPP_H
 #define PALMAPP_H
 
-#define PROGRAM_VERSION "0.1"
-
 
 /* ----- main form menu, main form ----- */
 #define ID_MENU_MAIN	1000
