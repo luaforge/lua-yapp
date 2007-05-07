@@ -11,11 +11,6 @@
 #include <string.h>
 #include <math.h>
 
-/*
- * global state
- * and initialization
- */
-
 
 static int palmos_init(lua_State *L) CSEC_PLIB;
 static int palmos_alert(lua_State *L) CSEC_PLIB;
@@ -35,6 +30,12 @@ static int palmos_heading(lua_State *L) CSEC_PLIB;
 static int palmos_walk(lua_State *L) CSEC_PLIB;
 static int palmos_turn(lua_State *L) CSEC_PLIB;
 static int palmos_event(lua_State *L) CSEC_PLIB;
+
+
+/*
+ * global state
+ * and initialization
+ */
 
 int luaopen_palmos(lua_State *L);
 
@@ -103,8 +104,9 @@ static int palmos_init(lua_State *L) {
  * alert(id)
  *
  * pops up the alert form with the specified id
+ *
+ * XXX add optional support for ^1, ^2, ^3 (custom alerts)?
  */
-
 static int palmos_alert(lua_State *L) {
 	UInt16 id;
 
@@ -175,8 +177,9 @@ static int palmos_closeres(lua_State *L) {
  *
  * returns the size of a resource, plus width and height if the resource
  * is a bitmap
+ *
+ * XXX TODO determine bitmap size
  */
-/* XXX TODO */
 static int palmos_getsize(lua_State *L) {
 	UInt32 hnum;
 	MemHandle hdl;
@@ -291,6 +294,8 @@ static int palmos_clear(lua_State *L) {
 	rect.extent.y = ymax - ymin;
 	WinFillRectangle(&rect, 0);
 	WinSetForeColor(save);
+
+	x = xmin; y = ymin;
 	return(0);
 }
 
@@ -397,6 +402,12 @@ static int palmos_drawbmp(lua_State *L) {
 		luaL_error(L, "invalid bitmap id");
 	WinDrawBitmap(bmp, x, y);
 	MemHandleUnlock(hdl);
+
+	/*
+	 * XXX determine the bitmap's size,
+	 * advance the cursor position
+	 */
+
 	return(0);
 }
 
@@ -411,6 +422,7 @@ static int palmos_heading(lua_State *L) {
 
 	deg = luaL_checknumber(L, 1);
 	hd = deg;
+	hd %= 360;
 
 	return(0);
 }
@@ -457,25 +469,36 @@ static int palmos_walk(lua_State *L) {
 }
 
 /*
- * turn()
+ * turn(g)
  *
- * returns the current x and y cursor position
+ * adds the positive or negative angle in degrees to the current heading,
+ * returns nothing
  */
 static int palmos_turn(lua_State *L) {
-	lua_pushnumber(L, x - xmin);
-	lua_pushnumber(L, y - ymin);
-	return(2);
+	typeof(hd) deg;
+
+	deg = luaL_checknumber(L, 1);
+	hd += deg;
+	if (hd < 0)
+		hd += 360;
+	hd %= 360;
+
+	return(0);
 }
 
 /*
  * event()
  *
- * returns the current x and y cursor position
+ * blocks until an event occurs,
+ * returns the type of event (predefined constants) and optionally
+ * more data depending on the event
+ * (NOT IMPLEMENTED YET)
+ *
+ * XXX implement this routine
  */
 static int palmos_event(lua_State *L) {
-	lua_pushnumber(L, x - xmin);
-	lua_pushnumber(L, y - ymin);
-	return(2);
+	luaL_error(L, "palmos.event() is not implemented");
+	return(0);
 }
 
 #warning "need to finish PalmOS binding"
@@ -497,7 +520,7 @@ static const luaL_Reg palmoslib[] = {
 	{ "pos", palmos_pos, },
 	{ "box", palmos_box, },
 	{ "drawbmp", palmos_drawbmp, },
-	/* logo stuff */
+	/* turtle graphics stuff */
 	{ "heading", palmos_heading, },
 	{ "walk", palmos_walk, },
 	{ "turn", palmos_turn, },
